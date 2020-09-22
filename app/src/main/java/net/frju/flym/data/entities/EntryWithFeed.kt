@@ -29,4 +29,5 @@ class EntryWithFeed(
         var feedTitle: String? = null,
         var feedLink: String = "",
         var feedImageLink: String? = null,
+        var feedIconLink: String? = null,
         var groupId: String? = null) : Parcelable

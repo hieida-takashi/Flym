@@ -45,6 +45,8 @@ data class Feed(
         var title: String? = null,
         @ColumnInfo(name = "feedImageLink")
         var imageLink: String? = null,
+        @ColumnInfo(name = "feedIconLink")
+        var iconUrl: String? = null,
         var fetchError: Boolean = false,
         var retrieveFullText: Boolean = false,
         var isGroup: Boolean = false,

@@ -33,6 +33,12 @@
             "notNull": false
           },
           {
+            "fieldPath": "imageLink",
+            "columnName": "feedImageLink",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
             "fieldPath": "fetchError",
             "columnName": "fetchError",
             "affinity": "INTEGER",

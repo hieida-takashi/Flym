@@ -24,11 +24,17 @@ import android.view.ViewGroup
 import com.bignerdranch.expandablerecyclerview.ChildViewHolder
 import com.bignerdranch.expandablerecyclerview.ExpandableRecyclerAdapter
 import com.bignerdranch.expandablerecyclerview.ParentViewHolder
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import kotlinx.android.synthetic.main.view_entry.view.*
 import kotlinx.android.synthetic.main.view_feed.view.*
+import kotlinx.android.synthetic.main.view_feed.view.title
 import net.fred.feedex.R
+import net.frju.flym.App.Companion.context
+import net.frju.flym.GlideApp
 import net.frju.flym.data.entities.Feed
 import net.frju.flym.data.entities.FeedWithCount
 import net.frju.flym.data.utils.PrefConstants
+import net.frju.flym.ui.entries.EntryAdapter
 import net.frju.flym.utils.getPrefString
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.sdk21.listeners.onClick
@@ -145,7 +151,18 @@ abstract class BaseFeedAdapter(groups: List<FeedGroup>) : ExpandableRecyclerAdap
                                 else -> R.drawable.ic_list_white_24dp
                             })
                 } else {
-                    itemView.icon.setImageDrawable(group.feedWithCount.feed.getLetterDrawable(true))
+                    if (group.feedWithCount.feed.iconUrl != null) {
+                        val letterDrawable = group.feedWithCount.feed.getLetterDrawable(true);
+                        GlideApp.with(context)
+                                .load(group.feedWithCount.feed.iconUrl)
+                                .centerCrop()
+                                .transition(DrawableTransitionOptions.withCrossFade(EntryAdapter.CROSS_FADE_FACTORY))
+                                .placeholder(letterDrawable)
+                                .error(letterDrawable)
+                                .into(itemView.icon)
+                    } else {
+                        itemView.icon.setImageDrawable(group.feedWithCount.feed.getLetterDrawable(true))
+                    }
                 }
             }
             itemView.title.text = group.feedWithCount.feed.title
