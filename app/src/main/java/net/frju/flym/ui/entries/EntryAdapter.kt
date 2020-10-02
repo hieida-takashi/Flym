@@ -63,7 +63,7 @@ class EntryAdapter(var displayThumbnails: Boolean, private val globalClickListen
             var mainImgUrl = if (TextUtils.isEmpty(entryWithFeed.entry.imageLink)) null else FetcherService.getDownloadedOrDistantImageUrl(entryWithFeed.entry.id, entryWithFeed.entry.imageLink!!)
 
             if (mainImgUrl == null) {
-                mainImgUrl = if (TextUtils.isEmpty(entryWithFeed.feedIconLink)) null else entryWithFeed.feedIconLink
+                mainImgUrl = if (TextUtils.isEmpty(entryWithFeed.feedImageLink)) null else entryWithFeed.feedImageLink
             }
             val letterDrawable = Feed.getLetterDrawable(entryWithFeed.entry.feedId, entryWithFeed.feedTitle)
             if (mainImgUrl != null) {

@@ -39,6 +39,7 @@ android {
 
     signingConfigs {
         debug {
+            storeFile file('C:\\Users\\hieida\\android.jks')
             if (properties.getProperty("KEYSTORE_PATH") != null) {
                 storeFile file(properties.getProperty("KEYSTORE_PATH"))
                 storePassword properties.getProperty("KEYSTORE_PASSWORD")

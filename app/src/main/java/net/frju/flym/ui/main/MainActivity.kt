@@ -28,6 +28,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.OpenableColumns
+import android.text.Html
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -55,6 +56,7 @@ import net.frju.flym.service.AutoRefreshJobService
 import net.frju.flym.service.FetcherService
 import net.frju.flym.ui.about.AboutActivity
 import net.frju.flym.ui.discover.DiscoverActivity
+import net.frju.flym.ui.discover.FeedSearchFragment
 import net.frju.flym.ui.entries.EntriesFragment
 import net.frju.flym.ui.entrydetails.EntryDetailsActivity
 import net.frju.flym.ui.entrydetails.EntryDetailsFragment
@@ -73,6 +75,8 @@ import org.jetbrains.anko.textColor
 import org.jetbrains.anko.textResource
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
+import org.json.JSONException
+import org.json.JSONObject
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
 import java.io.BufferedInputStream
@@ -90,6 +94,11 @@ class MainActivity : AppCompatActivity(), MainNavigator, AnkoLogger {
 
     companion object {
         const val EXTRA_FROM_NOTIF = "EXTRA_FROM_NOTIF"
+        private const val FEED_SEARCH_TITLE = "title"
+        private const val FEED_SEARCH_URL = "feedId"
+        private const val FEED_SEARCH_DESC = "description"
+        private const val FEED_SEARCH_ICON_URL = "iconUrl"
+        private val FEED_SEARCH_BLACKLIST = arrayOf("http://syndication.lesechos.fr/rss/rss_finance.xml")
 
         var isInForeground = false
 
@@ -590,6 +599,18 @@ class MainActivity : AppCompatActivity(), MainNavigator, AnkoLogger {
         }
     }
 
+    fun getFeedlySearchUrl(term: String): String {
+        return Uri.Builder()
+                .scheme("https")
+                .authority("cloud.feedly.com")
+                .path("/v3/search/feeds")
+                .appendQueryParameter("count", "20")
+                .appendQueryParameter("locale", resources.configuration.locale.language)
+                .appendQueryParameter("query", term)
+                .build()
+                .toString()
+    }
+
     private fun parseOpml(opmlReader: Reader) {
         var genId = 1L
         val feedList = mutableListOf<Feed>()
@@ -605,6 +626,28 @@ class MainActivity : AppCompatActivity(), MainNavigator, AnkoLogger {
                     if (!outline.xmlUrl.startsWith(OLD_GNEWS_TO_IGNORE)) {
                         topLevelFeed.link = outline.xmlUrl
                         topLevelFeed.retrieveFullText = outline.getAttributeValue(RETRIEVE_FULLTEXT_OPML_ATTR) == "true"
+                        FetcherService.createCall(getFeedlySearchUrl(outline.xmlUrl)).execute().use {
+                            it.body?.let { body ->
+                                val json = JSONObject(body.string())
+                                val entries = json.getJSONArray("results")
+                                for (i in 0 until entries.length()) {
+                                    try {
+                                        val entry = entries.get(i) as JSONObject
+                                        val url = entry.get(MainActivity.FEED_SEARCH_URL).toString().replace("feed/", "")
+                                        if (url.isNotEmpty() && !MainActivity.FEED_SEARCH_BLACKLIST.contains(url)) {
+
+                                            @Suppress("DEPRECATION")
+                                            val feedTitle = Html.fromHtml(entry.get(MainActivity.FEED_SEARCH_TITLE).toString()).toString()
+                                            val feedIconUrl = Html.fromHtml(entry.get(MainActivity.FEED_SEARCH_ICON_URL).toString()).toString()
+                                            topLevelFeed.title = feedTitle;
+                                            topLevelFeed.iconUrl = feedIconUrl;
+                                        }
+                                    } catch (e: JSONException) {
+                                        e.printStackTrace()
+                                    }
+                                }
+                            }
+                        }
                         feedList.add(topLevelFeed)
                     }
                 } else {

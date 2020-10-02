@@ -95,7 +95,7 @@ class DiscoverActivity : AppCompatActivity(), FeedManagementInterface {
             this.findViewById<Button>(R.id.btn_add_feed).onClick {
                 val text = searchInput.text.toString()
                 if (URLUtil.isNetworkUrl(text)) {
-                    addFeed(searchInput, text, text)
+                    addFeed(searchInput, text, text, "")
                     searchInput.setText("")
                 }
             }
@@ -133,9 +133,9 @@ class DiscoverActivity : AppCompatActivity(), FeedManagementInterface {
         searchInput?.setText(query)
     }
 
-    override fun addFeed(view: View, title: String, link: String) {
+    override fun addFeed(view: View, title: String, link: String, iconUrl: String) {
         doAsync {
-            val feedToAdd = Feed(link = link, title = title)
+            val feedToAdd = Feed(link = link, title = title, iconUrl = iconUrl)
             App.db.feedDao().insert(feedToAdd)
             uiThread {
                 view.snackbar(R.string.feed_added)

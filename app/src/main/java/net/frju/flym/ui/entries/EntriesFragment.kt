@@ -493,6 +493,15 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
         recycler_view.emptyView = empty_view
 
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val visibleItemCount = recyclerView.childCount
+                val manager = recyclerView.layoutManager as LinearLayoutManager?
+                val firstVisibleItem = manager!!.findFirstVisibleItemPosition()
+                val lastInScreen = firstVisibleItem + visibleItemCount
+            }
+
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 activity?.closeKeyboard()

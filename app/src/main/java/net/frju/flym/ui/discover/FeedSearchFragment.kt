@@ -90,7 +90,7 @@ class FeedSearchFragment : Fragment(), AdapterView.OnItemClickListener {
         resultsListView?.onItemClickListener = this
     }
 
-    private fun getFeedlySearchUrl(term: String): String {
+    fun getFeedlySearchUrl(term: String): String {
         return Uri.Builder()
                 .scheme("https")
                 .authority("cloud.feedly.com")
@@ -159,7 +159,7 @@ class FeedSearchFragment : Fragment(), AdapterView.OnItemClickListener {
             } else {
                 feedAdded?.setImageResource(R.drawable.ic_baseline_check_24)
                 item.isAdded = true
-                manageFeeds.addFeed(vw, item.name, item.link)
+                manageFeeds.addFeed(vw, item.name, item.link, item.iconUrl)
             }
         }
     }
