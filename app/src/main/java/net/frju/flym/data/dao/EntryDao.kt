@@ -19,12 +19,7 @@ package net.frju.flym.data.dao
 
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import net.frju.flym.data.entities.Entry
 import net.frju.flym.data.entities.EntryWithFeed
 
@@ -124,6 +119,9 @@ abstract class EntryDao {
 
     @Query("SELECT id FROM entries WHERE feedId IS (:feedId)")
     abstract fun idsForFeed(feedId: Long): List<String>
+
+    @Query("UPDATE entries SET read = 1 WHERE id IS :id")
+    abstract fun markAsRead(id: String)
 
     @Query("UPDATE entries SET read = 1 WHERE id IN (:ids)")
     abstract fun markAsRead(ids: List<String>)
