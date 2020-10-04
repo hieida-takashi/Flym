@@ -65,6 +65,9 @@ class EntryAdapter(var displayThumbnails: Boolean, private val globalClickListen
             if (mainImgUrl == null) {
                 mainImgUrl = if (TextUtils.isEmpty(entryWithFeed.feedImageLink)) null else entryWithFeed.feedImageLink
             }
+            if (mainImgUrl == null) {
+                mainImgUrl = if (TextUtils.isEmpty(entryWithFeed.feedIconLink)) null else entryWithFeed.feedIconLink
+            }
             val letterDrawable = Feed.getLetterDrawable(entryWithFeed.entry.feedId, entryWithFeed.feedTitle)
             if (mainImgUrl != null) {
                 GlideApp.with(context).load(mainImgUrl).centerCrop().transition(withCrossFade(CROSS_FADE_FACTORY)).placeholder(letterDrawable).error(letterDrawable).into(main_icon)

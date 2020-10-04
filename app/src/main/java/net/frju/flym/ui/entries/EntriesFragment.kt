@@ -43,9 +43,6 @@ import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_entries.*
-import kotlinx.android.synthetic.main.fragment_entries.coordinator
-import kotlinx.android.synthetic.main.fragment_entries.refresh_layout
-import kotlinx.android.synthetic.main.fragment_entries.toolbar
 import kotlinx.android.synthetic.main.view_entry.view.*
 import net.fred.feedex.R
 import net.frju.flym.App
@@ -500,6 +497,16 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                 val manager = recyclerView.layoutManager as LinearLayoutManager?
                 val firstVisibleItem = manager!!.findFirstVisibleItemPosition()
                 val lastInScreen = firstVisibleItem + visibleItemCount
+
+                if (firstVisibleItem > 0) {
+                    var readString = entryIds?.get(firstVisibleItem - 1)
+                    if (readString != null) {
+                        doAsync {
+                            App.db.entryDao().markAsRead(readString)
+                        }
+                    }
+                }
+
             }
 
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
