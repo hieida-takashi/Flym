@@ -493,14 +493,20 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
-                val visibleItemCount = recyclerView.childCount
                 val manager = recyclerView.layoutManager as LinearLayoutManager?
                 val firstVisibleItem = manager!!.findFirstVisibleItemPosition()
-                val lastInScreen = firstVisibleItem + visibleItemCount
+                val totalCount: Int = recyclerView.adapter!!.itemCount //合計のアイテム数
+                val childCount = recyclerView.childCount // RecyclerViewに表示されてるアイテム数
 
                 if (firstVisibleItem > 0) {
                     var readString = entryIds?.get(firstVisibleItem - 1)
-                    if (readString != null) {
+                    if (totalCount == childCount + firstVisibleItem) {
+                        doAsync {
+                            entryIds?.withIndex()?.groupBy { it.index / 300 }?.map { pair -> pair.value.map { it.value } }?.forEach {
+                                App.db.entryDao().markAsRead(it)
+                            }
+                        }
+                    } else if (readString != null) {
                         doAsync {
                             App.db.entryDao().markAsRead(readString)
                         }
