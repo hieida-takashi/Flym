@@ -159,7 +159,18 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             recycler_view.post {
                 listDisplayDate = Date().time
                 initDataObservers()
-                recycler_view.scrollToPosition(0)
+                var listLen = adapter.currentList?.size!!
+                var toPosition = 0
+                for (i in 0 until listLen) {
+                    var item = adapter.currentList?.get(i)
+                    if (item != null) {
+                        if (!item.entry.read) {
+                            toPosition = i
+                            break
+                        }
+                    }
+                }
+                recycler_view.scrollToPosition(toPosition)
             }
 
             toolbar.menu?.findItem(R.id.menu_entries__share)?.isVisible = it.itemId == R.id.favorites
